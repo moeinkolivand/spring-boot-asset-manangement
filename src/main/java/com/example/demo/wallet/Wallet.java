@@ -1,8 +1,9 @@
 package com.example.demo.wallet;
 
-import com.example.demo.currency.Currecy;
+import com.example.demo.currency.Currency;
 import com.example.demo.user.User;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -37,8 +38,11 @@ public class Wallet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currency_id")
-    private Currecy currecy;
     private Currency currency;
+
+    @ColumnDefault("1")
+    @Column(nullable = false)
+    private WalletStatus walletStatus;
 
 
     public Wallet() {}
@@ -95,5 +99,13 @@ public class Wallet {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public WalletStatus getWalletStatus() {
+        return walletStatus;
+    }
+
+    public void setWalletStatus(WalletStatus walletStatus) {
+        this.walletStatus = walletStatus;
     }
 }
