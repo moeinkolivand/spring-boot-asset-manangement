@@ -1,5 +1,6 @@
 package com.example.demo.wallet;
 
+import com.example.demo.user.User;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -23,6 +24,10 @@ public class Wallet {
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     public Wallet() {
     }
 
@@ -30,6 +35,14 @@ public class Wallet {
         this.name = name;
         this.balance = balance;
         this.createdAt = LocalDate.now();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Long getId() {
