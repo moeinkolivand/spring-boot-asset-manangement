@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "currencies")
-public class Currecy {
+public class Currency {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,10 @@ public class Currecy {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Currecy() {
+    public Currency() {
     }
 
-    public Currecy(String name) {
+    public Currency(String name) {
         this.name = name;
         this.createdAt = LocalDate.now();
     }

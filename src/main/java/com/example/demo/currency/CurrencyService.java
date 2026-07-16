@@ -17,13 +17,13 @@ public class CurrencyService {
 
     public void createCurrency(String name) {
         try {
-            currencyRepository.save(new Currecy(name));
+            currencyRepository.save(new Currency(name));
         } catch (DataIntegrityViolationException e) {
             throw new CurrencyAlreadyExistsException("Currency With Name: " + name + " Already Exists");
         }
     }
 
-    public Currecy getCurrency(String name) {
+    public Currency getCurrency(String name) {
         return currencyRepository.getByName(name).orElseThrow(() -> new EntityNotFoundException("Currency With Name: " + name + "Does Not Exists"));
     }
 }

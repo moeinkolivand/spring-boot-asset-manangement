@@ -38,6 +38,8 @@ public class Wallet {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currency_id")
     private Currecy currecy;
+    private Currency currency;
+
 
     public Wallet() {}
 
@@ -87,11 +89,11 @@ public class Wallet {
         this.createdAt = createdAt;
     }
 
-    public Currecy getCurrecy() {
-        return currecy;
+    public Currency getCurrency() {
+        return currency;
     }
 
-    public void setCurrecy(Currecy currecy) {
-        this.currecy = currecy;
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 }
