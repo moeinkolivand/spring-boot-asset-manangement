@@ -39,8 +39,7 @@ public class Wallet {
     @JoinColumn(name = "currency_id")
     private Currecy currecy;
 
-    public Wallet() {
-    }
+    public Wallet() {}
 
     public Wallet(String name, BigDecimal balance) {
         this.name = name;
