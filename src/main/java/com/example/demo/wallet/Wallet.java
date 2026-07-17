@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 
 @Entity
 @Table(
@@ -30,7 +30,7 @@ public class Wallet {
     private BigDecimal balance;
 
     @Column(nullable = false, updatable = false)
-    private LocalDate createdAt;
+    private Instant createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -40,17 +40,18 @@ public class Wallet {
     @JoinColumn(name = "currency_id")
     private Currency currency;
 
-    @ColumnDefault("1")
-    @Column(nullable = false)
+    @ColumnDefault("'ACTIVE'")
+    @Enumerated(EnumType.STRING)
     private WalletStatus walletStatus;
 
 
-    public Wallet() {}
+    public Wallet() {
+    }
 
     public Wallet(String name, BigDecimal balance) {
         this.name = name;
         this.balance = balance;
-        this.createdAt = LocalDate.now();
+        this.createdAt = Instant.now();
     }
 
     public User getUser() {
@@ -85,11 +86,11 @@ public class Wallet {
         this.balance = balance;
     }
 
-    public LocalDate getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
