@@ -48,10 +48,11 @@ public class Wallet {
     public Wallet() {
     }
 
-    public Wallet(String name, BigDecimal balance, User user) {
+    public Wallet(String name, BigDecimal balance, User user, Currency currency) {
         this.name = name;
         this.balance = balance;
         this.user = user;
+        this.currency = currency;
         this.createdAt = Instant.now();
     }
 
