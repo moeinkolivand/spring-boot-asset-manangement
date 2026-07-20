@@ -51,7 +51,7 @@ public class AuthService {
         return new AuthResponseDto(token, user.getPhoneNumber(), user.getRole().name());
     }
 
-    public AuthResponseDto login(LoginRequestDto request) {
+    public LoginResponseDto login(LoginRequestDto request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.phoneNumber(), request.password())
         );
@@ -60,10 +60,8 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String token = jwtService.generateToken(userDetails);
-        return new AuthResponseDto(
-                token,
-                userDetails.getUsername(),
-                userDetails.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "")
+        return new LoginResponseDto(
+                token
         );
     }
 }
