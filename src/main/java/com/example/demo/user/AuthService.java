@@ -22,21 +22,19 @@ public class AuthService {
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            AuthenticationManager authenticationManager
+            AuthenticationManager authenticationManager, WalletRepository walletRespository
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.walletRespository = walletRespository;
     }
 
     @Transactional
     public AuthResponseDto register(RegisterRequestDto request) {
         if (userRepository.existsByPhoneNumber(request.phoneNumber())) {
             throw new RuntimeException("Username already exists");
-        }
-        if (userRepository.existsByPhoneNumber(request.phoneNumber())) {
-            throw new RuntimeException("Email already exists");
         }
 
         User user = new User(
@@ -46,7 +44,8 @@ public class AuthService {
         );
 
         userRepository.save(user);
-
+        Wallet wallet = new Wallet("USDT", BigDecimal.ZERO, user);
+        walletRespository.save(wallet);
         String token = jwtService.generateToken(user);
         return new AuthResponseDto(token, user.getPhoneNumber(), user.getRole().name());
     }
