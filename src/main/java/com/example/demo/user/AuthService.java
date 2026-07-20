@@ -1,6 +1,8 @@
 package com.example.demo.user;
 
 
+import com.example.demo.wallet.Wallet;
+import com.example.demo.wallet.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final WalletRepository walletRespository;
 
     @Autowired
     public AuthService(
