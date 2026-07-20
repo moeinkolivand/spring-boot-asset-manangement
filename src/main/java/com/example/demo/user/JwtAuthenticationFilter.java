@@ -1,5 +1,9 @@
 package com.example.demo.user;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,8 +37,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         final String token = authHeader.substring(7);
-        final String username = jwtService.extractUsername(token);
-
+        String username;
+        try {
+            username = jwtService.extractUsername(token);
+        } catch (ExpiredJwtException | MalformedJwtException | SignatureException
+                 | UnsupportedJwtException | IllegalArgumentException ex) {
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (username == null || SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
