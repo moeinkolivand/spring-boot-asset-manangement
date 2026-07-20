@@ -48,6 +48,13 @@ public class Wallet {
     public Wallet() {
     }
 
+    public Wallet(String name, BigDecimal balance, User user) {
+        this.name = name;
+        this.balance = balance;
+        this.user = user;
+        this.createdAt = Instant.now();
+    }
+
     public Wallet(String name, BigDecimal balance) {
         this.name = name;
         this.balance = balance;
