@@ -35,11 +35,11 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Wallet> wallets = new ArrayList<>();
 
-    @ColumnDefault("")
+    @ColumnDefault("''")
     @Column
     private String name;
 
-    @ColumnDefault("")
+    @ColumnDefault("''")
     @Column(name = "last_name")
     private String lastName;
 
