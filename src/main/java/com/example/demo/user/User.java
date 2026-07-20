@@ -2,6 +2,7 @@ package com.example.demo.user;
 
 import com.example.demo.wallet.Wallet;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,6 +35,14 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Wallet> wallets = new ArrayList<>();
 
+    @ColumnDefault("")
+    @Column
+    private String name;
+
+    @ColumnDefault("")
+    @Column(name = "last_name")
+    private String lastName;
+
     public List<Wallet> getWallets() {
         return wallets;
     }
@@ -46,6 +55,15 @@ public class User implements UserDetails {
         this.password = password;
         this.createdAt = LocalDate.now();
         this.role = role;
+    }
+
+    public User(String phoneNumber, String password, UserRole role, String name, String lastName) {
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+        this.createdAt = LocalDate.now();
+        this.role = role;
+        this.name = name;
+        this.lastName = lastName;
     }
 
     public void setId(Long id) {
@@ -90,6 +108,23 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
 
     public String getPhoneNumber() {
         return phoneNumber;
