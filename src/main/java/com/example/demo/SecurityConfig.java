@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).exceptionHandling(
                         ex -> ex.authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_BAD_REQUEST, authException.getMessage());
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
                         })
                 );
 
