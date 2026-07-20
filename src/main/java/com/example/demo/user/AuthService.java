@@ -68,4 +68,16 @@ public class AuthService {
                 token
         );
     }
+
+    public UserProfileDto userProfile(User currentUser) {
+        return new UserProfileDto(currentUser.getName(), currentUser.getLastName(), currentUser.getPhoneNumber());
+    }
+
+    public UserProfileDto updateUserProfile(User currentUser, UserProfileDto userProfileDto) {
+        currentUser.setName(userProfileDto.name());
+        currentUser.setLastName(userProfileDto.lastName());
+        currentUser.setPhoneNumber(userProfileDto.phoneNumber());
+        User updateUser = userRepository.save(currentUser);
+        return new UserProfileDto(updateUser.getName(), updateUser.getLastName(), updateUser.getPhoneNumber());
+    }
 }
