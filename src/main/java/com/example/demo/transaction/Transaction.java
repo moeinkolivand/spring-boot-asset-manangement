@@ -1,52 +1,54 @@
 package com.example.demo.transaction;
 
+import com.example.demo.user.User;
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "transactions")
 public class Transaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private TransactionStatus transactionStatus;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column
+    @Column(nullable = false)
     private TransactionType transactionType;
 
-    @Column(name = "created_at", updatable = false)
-    private Instant createdAt;
-
-
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TransactionStatus status;
 
-    public Transaction() {
-    }
+    @Column(name = "idempotency_key", nullable = false, unique = true, updatable = false)
+    private UUID idempotencyKey;
 
-    public Transaction(TransactionStatus transactionStatus) {
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    protected Transaction() {}
+
+    public Transaction(User user, TransactionType transactionType,
+                       TransactionStatus status, UUID idempotencyKey) {
+        if (idempotencyKey == null) {
+            throw new IllegalArgumentException("idempotencyKey must be supplied by the client");
+        }
+        this.user = user;
+        this.transactionType = transactionType;
+        this.status = status;
+        this.idempotencyKey = idempotencyKey;
         this.createdAt = Instant.now();
-        this.transactionStatus = transactionStatus;
     }
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public TransactionStatus getTransactionType() {
-        return transactionStatus;
-    }
-
-    public TransactionStatus getStatus() {
-        return status;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
+    public Long getId() { return id; }
+    public User getUser() { return user; }
+    public TransactionType getTransactionType() { return transactionType; }
+    public TransactionStatus getStatus() { return status; }
+    public UUID getIdempotencyKey() { return idempotencyKey; }
+    public Instant getCreatedAt() { return createdAt; }
 }
