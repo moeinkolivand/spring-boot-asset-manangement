@@ -17,7 +17,7 @@ public class CurrencyDataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         String currencyName = "USDT";
-        if (currencyRepository.getByName(currencyName).isEmpty())
+        if (currencyRepository.findByName(currencyName).isEmpty())
             currencyRepository.save(new Currency(currencyName));
     }
 }

@@ -24,6 +24,6 @@ public class CurrencyService {
     }
 
     public Currency getCurrency(String name) {
-        return currencyRepository.getByName(name).orElseThrow(() -> new EntityNotFoundException("Currency With Name: " + name + "Does Not Exists"));
+        return currencyRepository.findByName(name).orElseThrow(() -> new EntityNotFoundException("Currency With Name: " + name + "Does Not Exists"));
     }
 }
