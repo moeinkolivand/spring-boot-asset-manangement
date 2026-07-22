@@ -33,7 +33,7 @@ public class LedgerEntry {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    protected LedgerEntry() {}
+    public LedgerEntry() {}
 
     public LedgerEntry(Transaction transaction, Wallet wallet,
                        LedgerEntryDirectionEnum ledgerEntryDirectionEnum, BigDecimal amount) {
