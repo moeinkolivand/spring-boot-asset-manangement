@@ -8,13 +8,19 @@ import com.example.demo.user.User;
 import com.example.demo.user.UserRepository;
 import com.example.demo.wallet.*;
 import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class TransactionService {
@@ -107,4 +113,10 @@ public class TransactionService {
         });
 
     }
+
+    public Page<Transaction> getUserTransactions(User user, Pageable pageable) {
+        Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
+        return transactionRepository.findAllByUser(user, newPageable);
+    }
+
 }
