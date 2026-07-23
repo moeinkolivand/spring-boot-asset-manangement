@@ -1,7 +1,7 @@
 package com.example.demo.wallet;
 
 import com.example.demo.currency.Currency;
-import com.example.demo.currency.CurrencyRepository;
+import com.example.demo.currency.CurrencyApiImpl;
 import com.example.demo.user.User;
 import com.example.demo.wallet.dto.WalletRequestDto;
 import com.example.demo.wallet.dto.WalletResponseDto;
@@ -18,16 +18,16 @@ import java.util.List;
 public class WalletService {
 
     private final WalletRepository walletRepository;
-    private final CurrencyRepository currencyRepository;
+    private final CurrencyApiImpl currencyApi;
 
     @Autowired
-    public WalletService(WalletRepository walletRepository, CurrencyRepository currencyRepository) {
+    public WalletService(WalletRepository walletRepository, CurrencyApiImpl currencyApi) {
         this.walletRepository = walletRepository;
-        this.currencyRepository = currencyRepository;
+        this.currencyApi = currencyApi;
     }
 
     public WalletResponseDto createWallet(WalletRequestDto walletRequestDto, User currentUser) {
-        Currency currency = currencyRepository.findById(walletRequestDto.currencyId()).orElseThrow(
+        Currency currency = currencyApi.findById(walletRequestDto.currencyId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Currency Not Found")
         );
         if (walletRepository.existsByUserAndCurrency(currentUser, currency)) {

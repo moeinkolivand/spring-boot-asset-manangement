@@ -1,7 +1,7 @@
 package com.example.demo.wallet;
 
 import com.example.demo.currency.Currency;
-import com.example.demo.currency.CurrencyRepository;
+import com.example.demo.currency.CurrencyApiImpl;
 import com.example.demo.user.User;
 import com.example.demo.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -13,20 +13,20 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 @Component
-@Order(3) // Runs after UserSeeder (1) and CurrencySeeder (2)
+@Order(3)
 public class SystemWalletSeeder implements CommandLineRunner {
 
     private final WalletRepository walletRepository;
     private final UserRepository userRepository;
-    private final CurrencyRepository currencyRepository;
+    private final CurrencyApiImpl currencyApi;
 
     @Autowired
     public SystemWalletSeeder(WalletRepository walletRepository,
                               UserRepository userRepository,
-                              CurrencyRepository currencyRepository) {
+                              CurrencyApiImpl currencyApi) {
         this.walletRepository = walletRepository;
         this.userRepository = userRepository;
-        this.currencyRepository = currencyRepository;
+        this.currencyApi = currencyApi;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class SystemWalletSeeder implements CommandLineRunner {
                 ));
 
         String currencyName = "USDT";
-        Currency usdtCurrency = currencyRepository.findByName(currencyName)
+        Currency usdtCurrency = currencyApi.getCurrencyByName(currencyName)
                 .orElseThrow(() -> new IllegalStateException(
                         "USDT currency not found! Please ensure CurrencySeeder (@Order(2)) ran first."
                 ));

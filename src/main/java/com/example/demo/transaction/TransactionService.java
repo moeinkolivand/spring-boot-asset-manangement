@@ -1,6 +1,5 @@
 package com.example.demo.transaction;
 
-import com.example.demo.currency.CurrencyRepository;
 import com.example.demo.ledger.LedgerEntry;
 import com.example.demo.ledger.LedgerEntryDirectionEnum;
 import com.example.demo.ledger.LedgerRepository;
@@ -13,14 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class TransactionService {
@@ -28,16 +25,14 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
     private final LedgerRepository ledgerRepository;
-    private final CurrencyRepository currencyRepository;
     private final TransactionTemplate transactionTemplate;
     private final UserRepository userRepository;
 
     @Autowired
-    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository, LedgerRepository ledgerRepository, CurrencyRepository currencyRepository, TransactionTemplate transactionTemplate, UserRepository userRepository) {
+    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository, LedgerRepository ledgerRepository, TransactionTemplate transactionTemplate, UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
         this.walletRepository = walletRepository;
         this.ledgerRepository = ledgerRepository;
-        this.currencyRepository = currencyRepository;
         this.transactionTemplate = transactionTemplate;
         this.userRepository = userRepository;
     }

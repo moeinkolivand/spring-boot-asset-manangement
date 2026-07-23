@@ -2,7 +2,7 @@ package com.example.demo.user;
 
 
 import com.example.demo.currency.Currency;
-import com.example.demo.currency.CurrencyRepository;
+import com.example.demo.currency.CurrencyApiImpl;
 import com.example.demo.wallet.Wallet;
 import com.example.demo.wallet.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +23,21 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final WalletRepository walletRespository;
-    private final CurrencyRepository currencyRepository;
+    private final CurrencyApiImpl currencyApi;
 
     @Autowired
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            AuthenticationManager authenticationManager, WalletRepository walletRespository, CurrencyRepository currencyRepository
+            AuthenticationManager authenticationManager, WalletRepository walletRespository, CurrencyApiImpl currencyApi
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.walletRespository = walletRespository;
-        this.currencyRepository = currencyRepository;
+        this.currencyApi = currencyApi;
     }
 
     @Transactional
@@ -53,7 +53,7 @@ public class AuthService {
         );
 
         userRepository.save(user);
-        Currency currency = currencyRepository.getReferenceById(1L);
+        Currency currency = currencyApi.getReferenceById(1L);
         Wallet wallet = new Wallet("USDT", BigDecimal.ZERO, user, currency);
         walletRespository.save(wallet);
         String token = jwtService.generateToken(user);
