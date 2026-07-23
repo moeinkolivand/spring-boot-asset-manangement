@@ -1,5 +1,6 @@
 package com.example.demo.ledger;
 
+import com.example.demo.ledger.internal.LedgerEntryDirectionEnum;
 import com.example.demo.transaction.Transaction;
 import com.example.demo.wallet.Wallet;
 import jakarta.persistence.*;
