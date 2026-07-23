@@ -39,18 +39,18 @@ public class TransactionService {
     private record WithdrawalWallets(Wallet userWallet, Wallet systemWallet) {
     }
 
-    private WithdrawalWallets resolveAndValidate(WithdrawDto dto, User user) {
-        Wallet userWallet = walletRepository.findByCurrencyNameAndUser(dto.currencyName(), user)
+    private WithdrawalWallets resolveAndValidate(String currencyName, User user) {
+        Wallet userWallet = walletRepository.findByCurrencyNameAndUser(currencyName, user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
         User adminUser = userRepository.findByUsername("09123456789").orElseThrow(() -> new RuntimeException("User Admin Does Not Exists"));
-        Wallet systemWallet = walletRepository.findByCurrencyNameAndUser(dto.currencyName(), adminUser).orElseThrow(
+        Wallet systemWallet = walletRepository.findByCurrencyNameAndUser(currencyName, adminUser).orElseThrow(
                 () -> new EntityNotFoundException("System Wallet With This Currency Not Found")
         );
         if (isWalletFrozen(userWallet)) {
             throw new ForbiddenActionOnFreezeWalletException("Wallet Is Freeze And You Cant Do Any Action WithIt");
         }
         if (isWalletFrozen(systemWallet)) {
-            throw new ForbiddenActionOnFreezeWalletException("The Withdraw On This Currency " + dto.currencyName() + "Is Freeze For Now");
+            throw new ForbiddenActionOnFreezeWalletException("The Withdraw On This Currency " + currencyName + "Is Freeze For Now");
         }
         return new WithdrawalWallets(userWallet, systemWallet);
     }
@@ -60,7 +60,7 @@ public class TransactionService {
                 .ifPresent(existing -> {
                     throw new TransactionAlreadyProccesedException("Already processed");
                 });
-        WithdrawalWallets withdrawalWallets = resolveAndValidate(withdrawDto, user);
+        WithdrawalWallets withdrawalWallets = resolveAndValidate(withdrawDto.currencyName(), user);
         transactionTemplate.execute(status -> {
             Wallet userWallet = walletRepository.findByIdForUpdate(withdrawalWallets.userWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
             if (isWalletBalanceGoesToNegative(userWallet, withdrawDto.amount())) {
@@ -86,8 +86,25 @@ public class TransactionService {
         return wallet.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 0;
     }
 
-    public void deposit() {
+    public void deposit(DepositDto depositDto, User user) {
+        transactionRepository.findByIdempotencyKey(depositDto.idempotencyKey())
+                .ifPresent(existing -> {
+                    throw new TransactionAlreadyProccesedException("Already processed");
+                });
+        WithdrawalWallets withdrawalWallets = resolveAndValidate(depositDto.currencyName(), user);
+        transactionTemplate.execute(status -> {
+            Wallet userWallet = walletRepository.findByIdForUpdate(withdrawalWallets.userWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
+            Wallet systemWallet = walletRepository.findByIdForUpdate(withdrawalWallets.systemWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
+            if (isWalletBalanceGoesToNegative(systemWallet, depositDto.amount())) {
+                throw new InsufficientWalletBalanceException("Insufficient Balance");
+            }
+            Transaction transaction = transactionRepository.save(new Transaction(
+                    user, TransactionType.DEPOSIT, TransactionStatus.COMPLETED, depositDto.idempotencyKey()
+            ));
+            ledgerRepository.save(new LedgerEntry(transaction, systemWallet, LedgerEntryDirectionEnum.DEBIT, depositDto.amount()));
+            ledgerRepository.save(new LedgerEntry(transaction, userWallet, LedgerEntryDirectionEnum.CREDIT, depositDto.amount()));
+            return null;
+        });
 
     }
-
 }
