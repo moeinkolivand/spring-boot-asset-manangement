@@ -1,5 +1,6 @@
-package com.example.demo.transaction;
+package com.example.demo.transaction.internal;
 
+import com.example.demo.transaction.Transaction;
 import com.example.demo.user.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

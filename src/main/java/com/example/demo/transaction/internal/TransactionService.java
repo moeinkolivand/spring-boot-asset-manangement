@@ -1,8 +1,7 @@
-package com.example.demo.transaction;
+package com.example.demo.transaction.internal;
 
-import com.example.demo.ledger.LedgerEntry;
-import com.example.demo.ledger.LedgerEntryDirectionEnum;
-import com.example.demo.ledger.LedgerRepository;
+import com.example.demo.ledger.LedgerApi;
+import com.example.demo.transaction.Transaction;
 import com.example.demo.user.User;
 import com.example.demo.user.UserRepository;
 import com.example.demo.wallet.*;
@@ -24,15 +23,21 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
-    private final LedgerRepository ledgerRepository;
+    private final LedgerApi ledgerApi;
     private final TransactionTemplate transactionTemplate;
     private final UserRepository userRepository;
 
     @Autowired
-    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository, LedgerRepository ledgerRepository, TransactionTemplate transactionTemplate, UserRepository userRepository) {
+    public TransactionService(
+            TransactionRepository transactionRepository,
+            WalletRepository walletRepository,
+            LedgerApi ledgerApi,
+            TransactionTemplate transactionTemplate,
+            UserRepository userRepository
+    ) {
         this.transactionRepository = transactionRepository;
         this.walletRepository = walletRepository;
-        this.ledgerRepository = ledgerRepository;
+        this.ledgerApi = ledgerApi;
         this.transactionTemplate = transactionTemplate;
         this.userRepository = userRepository;
     }
@@ -73,8 +78,8 @@ public class TransactionService {
             systemWallet.setBalance(systemWallet.getBalance().add(withdrawDto.amount()));
             walletRepository.save(userWallet);
             walletRepository.save(systemWallet);
-            ledgerRepository.save(new LedgerEntry(transaction, userWallet, LedgerEntryDirectionEnum.DEBIT, withdrawDto.amount()));
-            ledgerRepository.save(new LedgerEntry(transaction, systemWallet, LedgerEntryDirectionEnum.CREDIT, withdrawDto.amount()));
+            ledgerApi.createDebit(transaction, userWallet, withdrawDto.amount());
+            ledgerApi.createCredit(transaction, systemWallet, withdrawDto.amount());
             return null;
         });
     }
@@ -102,8 +107,8 @@ public class TransactionService {
             Transaction transaction = transactionRepository.save(new Transaction(
                     user, TransactionType.DEPOSIT, TransactionStatus.COMPLETED, depositDto.idempotencyKey()
             ));
-            ledgerRepository.save(new LedgerEntry(transaction, systemWallet, LedgerEntryDirectionEnum.DEBIT, depositDto.amount()));
-            ledgerRepository.save(new LedgerEntry(transaction, userWallet, LedgerEntryDirectionEnum.CREDIT, depositDto.amount()));
+            ledgerApi.createDebit(transaction, systemWallet, depositDto.amount());
+            ledgerApi.createCredit(transaction, userWallet,  depositDto.amount());
             return null;
         });
 

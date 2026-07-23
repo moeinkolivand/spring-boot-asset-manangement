@@ -1,4 +1,4 @@
-package com.example.demo.transaction;
+package com.example.demo.transaction.internal;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record DepositDto(
+public record WithdrawDto(
         @NotBlank(message = "the currency name is required")
         String currencyName,
 

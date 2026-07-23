@@ -1,5 +1,7 @@
 package com.example.demo.transaction;
 
+import com.example.demo.transaction.internal.TransactionStatus;
+import com.example.demo.transaction.internal.TransactionType;
 import com.example.demo.user.User;
 import jakarta.persistence.*;
 
