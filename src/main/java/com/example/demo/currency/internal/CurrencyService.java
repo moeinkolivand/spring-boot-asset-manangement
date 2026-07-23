@@ -1,5 +1,6 @@
-package com.example.demo.currency;
+package com.example.demo.currency.internal;
 
+import com.example.demo.currency.Currency;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
