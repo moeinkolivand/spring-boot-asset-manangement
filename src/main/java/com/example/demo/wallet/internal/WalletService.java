@@ -1,10 +1,10 @@
-package com.example.demo.wallet;
+package com.example.demo.wallet.internal;
 
 import com.example.demo.currency.Currency;
 import com.example.demo.currency.CurrencyApiImpl;
-import com.example.demo.user.User;
-import com.example.demo.wallet.dto.WalletRequestDto;
-import com.example.demo.wallet.dto.WalletResponseDto;
+import com.example.demo.wallet.Wallet;
+import com.example.demo.wallet.internal.dto.WalletRequestDto;
+import com.example.demo.wallet.internal.dto.WalletResponseDto;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,14 +26,14 @@ public class WalletService {
         this.currencyApi = currencyApi;
     }
 
-    public WalletResponseDto createWallet(WalletRequestDto walletRequestDto, User currentUser) {
+    public WalletResponseDto createWallet(WalletRequestDto walletRequestDto, Long userId) {
         Currency currency = currencyApi.findById(walletRequestDto.currencyId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Currency Not Found")
         );
-        if (walletRepository.existsByUserAndCurrency(currentUser, currency)) {
+        if (walletRepository.existsByUserIdAndCurrency(userId, currency)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Wallet With Currency " + currency.getName() + " exists");
         }
-        Wallet wallet = new Wallet(walletRequestDto.name(), BigDecimal.ZERO, currentUser, currency);
+        Wallet wallet = new Wallet(walletRequestDto.name(), BigDecimal.ZERO, userId, currency);
         walletRepository.save(wallet);
         return returnWalletResponse(wallet);
     }
@@ -67,8 +67,8 @@ public class WalletService {
         );
     }
 
-    public @Nullable List<WalletResponseDto> getUserWallets(User user) {
-        return walletRepository.findByUser(user).stream().map(this::returnWalletResponse).toList();
+    public @Nullable List<WalletResponseDto> getUserWallets(Long userId) {
+        return walletRepository.findByUserId(userId).stream().map(this::returnWalletResponse).toList();
     }
 
 }

@@ -1,9 +1,8 @@
-package com.example.demo.wallet;
+package com.example.demo.wallet.internal;
 
 
-import com.example.demo.user.User;
-import com.example.demo.wallet.dto.WalletRequestDto;
-import com.example.demo.wallet.dto.WalletResponseDto;
+import com.example.demo.wallet.internal.dto.WalletRequestDto;
+import com.example.demo.wallet.internal.dto.WalletResponseDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,8 +29,11 @@ public class WalletController {
     }
 
     @PostMapping
-    public ResponseEntity<WalletResponseDto> createWallet(@Valid @RequestBody WalletRequestDto walletRequestDto, @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(walletService.createWallet(walletRequestDto, currentUser));
+    public ResponseEntity<WalletResponseDto> createWallet(
+            @Valid @RequestBody WalletRequestDto walletRequestDto,
+            @AuthenticationPrincipal(expression = "id") Long userId
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(walletService.createWallet(walletRequestDto, userId));
     }
 
     @PutMapping("/{id}")
@@ -43,8 +45,10 @@ public class WalletController {
     }
 
     @GetMapping
-    public ResponseEntity<List<WalletResponseDto>> getUserWallets(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(walletService.getUserWallets(currentUser));
+    public ResponseEntity<List<WalletResponseDto>> getUserWallets(
+            @AuthenticationPrincipal(expression = "id") Long userId
+    ) {
+        return ResponseEntity.ok(walletService.getUserWallets(userId));
     }
 
 }

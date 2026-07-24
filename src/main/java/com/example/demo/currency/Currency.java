@@ -1,6 +1,5 @@
 package com.example.demo.currency;
 
-import com.example.demo.user.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -18,10 +17,6 @@ public class Currency {
 
     @Column(updatable = false, name = "created_at")
     private LocalDate createdAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
     public Currency() {
     }
@@ -41,13 +36,5 @@ public class Currency {
 
     public LocalDate getCreatedAt() {
         return createdAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

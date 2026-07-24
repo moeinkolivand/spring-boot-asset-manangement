@@ -107,25 +107,25 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-		<!-- Spring Modulith -->
-		<dependency>
-			<groupId>org.springframework.modulith</groupId>
-			<artifactId>spring-modulith-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+<!--		&lt;!&ndash; Spring Modulith &ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.modulith</groupId>-->
+<!--			<artifactId>spring-modulith-starter-test</artifactId>-->
+<!--			<scope>test</scope>-->
+<!--		</dependency>-->
     </dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.modulith</groupId>
-				<artifactId>spring-modulith-bom</artifactId>
-				<version>${spring-modulith.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+<!--	<dependencyManagement>-->
+<!--		<dependencies>-->
+<!--			<dependency>-->
+<!--				<groupId>org.springframework.modulith</groupId>-->
+<!--				<artifactId>spring-modulith-bom</artifactId>-->
+<!--				<version>${spring-modulith.version}</version>-->
+<!--				<type>pom</type>-->
+<!--				<scope>import</scope>-->
+<!--			</dependency>-->
+<!--		</dependencies>-->
+<!--	</dependencyManagement>-->
 
 	<build>
 		<plugins>

@@ -1,9 +1,10 @@
-package com.example.demo.wallet;
+package com.example.demo.wallet.internal;
 
 import com.example.demo.currency.Currency;
 import com.example.demo.currency.CurrencyApiImpl;
-import com.example.demo.user.User;
-import com.example.demo.user.UserRepository;
+import com.example.demo.user.internal.UserRepository;
+import com.example.demo.wallet.Wallet;
+import com.example.demo.wallet.WalletApiImpl;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -16,12 +17,12 @@ import java.math.BigDecimal;
 @Order(3)
 public class SystemWalletSeeder implements CommandLineRunner {
 
-    private final WalletRepository walletRepository;
+    private final WalletApiImpl walletRepository;
     private final UserRepository userRepository;
     private final CurrencyApiImpl currencyApi;
 
     @Autowired
-    public SystemWalletSeeder(WalletRepository walletRepository,
+    public SystemWalletSeeder(WalletApiImpl walletRepository,
                               UserRepository userRepository,
                               CurrencyApiImpl currencyApi) {
         this.walletRepository = walletRepository;
@@ -34,7 +35,7 @@ public class SystemWalletSeeder implements CommandLineRunner {
     public void run(String... args) {
 
         String adminPhone = "09123456789";
-        User adminUser = userRepository.findByPhoneNumber(adminPhone)
+        Long adminUser = userRepository.findIdByPhoneNumber(adminPhone)
                 .orElseThrow(() -> new IllegalStateException(
                         "Admin user not found! Please ensure AdminUserSeeder (@Order(1)) ran first."
                 ));
@@ -54,7 +55,7 @@ public class SystemWalletSeeder implements CommandLineRunner {
             );
             systemWallet.setWalletStatus(WalletStatus.ACTIVE);
 
-            walletRepository.save(systemWallet);
+            walletRepository.createWallet(systemWallet);
 
             System.out.println("System wallet created successfully for Admin with 1,000,000 USDT!");
         } else {

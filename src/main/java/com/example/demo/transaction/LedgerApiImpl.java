@@ -1,8 +1,7 @@
-package com.example.demo.ledger;
+package com.example.demo.transaction;
 
-import com.example.demo.ledger.internal.LedgerEntryDirectionEnum;
-import com.example.demo.ledger.internal.LedgerRepository;
-import com.example.demo.transaction.Transaction;
+import com.example.demo.transaction.internal.LedgerEntryDirectionEnum;
+import com.example.demo.transaction.internal.LedgerRepository;
 import com.example.demo.wallet.Wallet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

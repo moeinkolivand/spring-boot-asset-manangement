@@ -1,4 +1,4 @@
-package com.example.demo.user;
+package com.example.demo.user.internal;
 
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

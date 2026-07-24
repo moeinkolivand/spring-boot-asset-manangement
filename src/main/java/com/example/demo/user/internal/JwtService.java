@@ -1,4 +1,4 @@
-package com.example.demo.user;
+package com.example.demo.user.internal;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

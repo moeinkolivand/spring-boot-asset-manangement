@@ -1,5 +1,7 @@
-package com.example.demo.currency;
+package com.example.demo.currency.internal;
 
+
+import com.example.demo.currency.Currency;
 
 import java.util.Optional;
 

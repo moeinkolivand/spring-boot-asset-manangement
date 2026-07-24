@@ -1,4 +1,4 @@
-package com.example.demo.user;
+package com.example.demo.user.internal;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

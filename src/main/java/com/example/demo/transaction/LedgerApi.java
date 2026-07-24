@@ -1,6 +1,5 @@
-package com.example.demo.ledger;
+package com.example.demo.transaction;
 
-import com.example.demo.transaction.Transaction;
 import com.example.demo.wallet.Wallet;
 
 import java.math.BigDecimal;

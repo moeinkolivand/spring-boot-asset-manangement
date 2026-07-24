@@ -1,4 +1,4 @@
-package com.example.demo.user;
+package com.example.demo.user.internal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Pattern;

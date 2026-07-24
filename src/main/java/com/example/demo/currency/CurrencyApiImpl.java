@@ -1,5 +1,6 @@
 package com.example.demo.currency;
 
+import com.example.demo.currency.internal.CurrencyApi;
 import com.example.demo.currency.internal.CurrencyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.example.demo.wallet;
 
 import com.example.demo.currency.Currency;
-import com.example.demo.user.User;
+import com.example.demo.wallet.internal.WalletStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -32,9 +32,8 @@ public class Wallet {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currency_id")
@@ -48,10 +47,10 @@ public class Wallet {
     public Wallet() {
     }
 
-    public Wallet(String name, BigDecimal balance, User user, Currency currency) {
+    public Wallet(String name, BigDecimal balance, Long userId, Currency currency) {
         this.name = name;
         this.balance = balance;
-        this.user = user;
+        this.userId = userId;
         this.currency = currency;
         this.createdAt = Instant.now();
     }
@@ -62,12 +61,12 @@ public class Wallet {
         this.createdAt = Instant.now();
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Long getId() {

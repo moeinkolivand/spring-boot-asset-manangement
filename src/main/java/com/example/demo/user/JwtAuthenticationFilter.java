@@ -1,5 +1,6 @@
 package com.example.demo.user;
 
+import com.example.demo.user.internal.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;

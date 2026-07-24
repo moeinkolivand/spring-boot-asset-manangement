@@ -1,7 +1,6 @@
 package com.example.demo.transaction.internal;
 
 import com.example.demo.transaction.Transaction;
-import com.example.demo.user.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,23 +22,31 @@ public class TransactionController {
     }
 
     @PostMapping("withdraw")
-    public ResponseEntity<String> withdraw(@AuthenticationPrincipal User user, @Valid @RequestBody WithdrawDto withdrawDto) {
-        transactionService.withdraw(withdrawDto, user);
+    public ResponseEntity<String> withdraw(
+            @AuthenticationPrincipal(expression = "id") Long userId,
+            @Valid @RequestBody WithdrawDto withdrawDto
+    ) {
+        transactionService.withdraw(withdrawDto, userId);
         return ResponseEntity.ok("");
     }
 
 
     @PostMapping("deposit")
-    public ResponseEntity<String> deposit(@AuthenticationPrincipal User user, @Valid @RequestBody DepositDto depositDto) {
-        transactionService.deposit(depositDto, user);
+    public ResponseEntity<String> deposit(
+            @AuthenticationPrincipal(expression = "id") Long userId,
+            @Valid @RequestBody DepositDto depositDto
+    ) {
+        transactionService.deposit(depositDto, userId);
         return ResponseEntity.ok("");
     }
 
     @GetMapping
-    public ResponseEntity<Page<Transaction>> getUserTransactions(@AuthenticationPrincipal User user, @PageableDefault(
+    public ResponseEntity<Page<Transaction>> getUserTransactions(
+            @AuthenticationPrincipal(expression = "id") Long userId,
+            @PageableDefault(
             size = 10, sort = "created_at", direction = Sort.Direction.DESC
     )Pageable pageable){
-        return ResponseEntity.ok(transactionService.getUserTransactions(user, pageable));
+        return ResponseEntity.ok(transactionService.getUserTransactions(userId, pageable));
     }
 
 }

@@ -1,12 +1,12 @@
 package com.example.demo.transaction.internal;
 
-import com.example.demo.ledger.LedgerApi;
+import com.example.demo.transaction.LedgerApi;
 import com.example.demo.transaction.Transaction;
-import com.example.demo.user.User;
-import com.example.demo.user.UserRepository;
-import com.example.demo.wallet.*;
+import com.example.demo.wallet.ForbiddenActionOnFreezeWalletException;
+import com.example.demo.wallet.InsufficientWalletBalanceException;
+import com.example.demo.wallet.Wallet;
+import com.example.demo.wallet.WalletApi;
 import jakarta.persistence.EntityNotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,85 +22,76 @@ import java.math.BigDecimal;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final WalletRepository walletRepository;
+    private final WalletApi walletApi;
     private final LedgerApi ledgerApi;
     private final TransactionTemplate transactionTemplate;
-    private final UserRepository userRepository;
 
     @Autowired
     public TransactionService(
             TransactionRepository transactionRepository,
-            WalletRepository walletRepository,
+            WalletApi walletApi,
             LedgerApi ledgerApi,
-            TransactionTemplate transactionTemplate,
-            UserRepository userRepository
+            TransactionTemplate transactionTemplate
     ) {
         this.transactionRepository = transactionRepository;
-        this.walletRepository = walletRepository;
+        this.walletApi = walletApi;
         this.ledgerApi = ledgerApi;
         this.transactionTemplate = transactionTemplate;
-        this.userRepository = userRepository;
     }
 
-    private record WithdrawalWallets(Wallet userWallet, Wallet systemWallet) {
-    }
+    private record WithdrawalWallets(Wallet userWallet, Wallet systemWallet) { }
 
-    private WithdrawalWallets resolveAndValidate(String currencyName, User user) {
-        Wallet userWallet = walletRepository.findByCurrencyNameAndUser(currencyName, user)
+    private WithdrawalWallets resolveAndValidate(String currencyName, Long user) {
+        Wallet userWallet = walletApi.findByCurrencyNameAndUser(currencyName, user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
-        User adminUser = userRepository.findByUsername("09123456789").orElseThrow(() -> new RuntimeException("User Admin Does Not Exists"));
-        Wallet systemWallet = walletRepository.findByCurrencyNameAndUser(currencyName, adminUser).orElseThrow(
+        Wallet systemWallet = walletApi.findByCurrencyNameAndUser(currencyName, user).orElseThrow(
                 () -> new EntityNotFoundException("System Wallet With This Currency Not Found")
         );
-        if (isWalletFrozen(userWallet)) {
+        if (walletApi.isWalletFrozen(userWallet)) {
             throw new ForbiddenActionOnFreezeWalletException("Wallet Is Freeze And You Cant Do Any Action WithIt");
         }
-        if (isWalletFrozen(systemWallet)) {
+        if (walletApi.isWalletFrozen(systemWallet)) {
             throw new ForbiddenActionOnFreezeWalletException("The Withdraw On This Currency " + currencyName + "Is Freeze For Now");
         }
         return new WithdrawalWallets(userWallet, systemWallet);
     }
 
-    public void withdraw(WithdrawDto withdrawDto, User user) {
+    public void withdraw(WithdrawDto withdrawDto, Long user) {
         transactionRepository.findByIdempotencyKey(withdrawDto.idempotencyKey())
                 .ifPresent(existing -> {
                     throw new TransactionAlreadyProccesedException("Already processed");
                 });
         WithdrawalWallets withdrawalWallets = resolveAndValidate(withdrawDto.currencyName(), user);
         transactionTemplate.execute(status -> {
-            Wallet userWallet = walletRepository.findByIdForUpdate(withdrawalWallets.userWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
+            Wallet userWallet = walletApi.findByIdForUpdate(withdrawalWallets.userWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
             if (isWalletBalanceGoesToNegative(userWallet, withdrawDto.amount())) {
                 throw new InsufficientWalletBalanceException("Insufficient Wallet Balance");
             }
-            Wallet systemWallet = walletRepository.findByIdForUpdate(withdrawalWallets.systemWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
+            Wallet systemWallet = walletApi.findByIdForUpdate(withdrawalWallets.systemWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
             Transaction transaction = transactionRepository.save(new Transaction(user, TransactionType.WITHDRAW, TransactionStatus.COMPLETED, withdrawDto.idempotencyKey()));
             userWallet.setBalance(userWallet.getBalance().subtract(withdrawDto.amount()));
             systemWallet.setBalance(systemWallet.getBalance().add(withdrawDto.amount()));
-            walletRepository.save(userWallet);
-            walletRepository.save(systemWallet);
+            walletApi.createWallet(userWallet);
+            walletApi.createWallet(systemWallet);
             ledgerApi.createDebit(transaction, userWallet, withdrawDto.amount());
             ledgerApi.createCredit(transaction, systemWallet, withdrawDto.amount());
             return null;
         });
     }
 
-    private boolean isWalletFrozen(Wallet wallet) {
-        return wallet.getWalletStatus() == WalletStatus.FROZEN;
-    }
-
     private boolean isWalletBalanceGoesToNegative(Wallet wallet, BigDecimal amount) {
         return wallet.getBalance().subtract(amount).compareTo(BigDecimal.ZERO) < 0;
     }
 
-    public void deposit(DepositDto depositDto, User user) {
+    public void deposit(DepositDto depositDto, Long user) {
         transactionRepository.findByIdempotencyKey(depositDto.idempotencyKey())
                 .ifPresent(existing -> {
                     throw new TransactionAlreadyProccesedException("Already processed");
                 });
         WithdrawalWallets withdrawalWallets = resolveAndValidate(depositDto.currencyName(), user);
         transactionTemplate.execute(status -> {
-            Wallet userWallet = walletRepository.findByIdForUpdate(withdrawalWallets.userWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
-            Wallet systemWallet = walletRepository.findByIdForUpdate(withdrawalWallets.systemWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
+            Wallet userWallet = walletApi.findByIdForUpdate(withdrawalWallets.userWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
+            Wallet systemWallet = walletApi.findByIdForUpdate(withdrawalWallets.systemWallet.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found"));
             if (isWalletBalanceGoesToNegative(systemWallet, depositDto.amount())) {
                 throw new InsufficientWalletBalanceException("Insufficient Balance");
             }
@@ -114,7 +105,7 @@ public class TransactionService {
 
     }
 
-    public Page<Transaction> getUserTransactions(User user, Pageable pageable) {
+    public Page<Transaction> getUserTransactions(Long user, Pageable pageable) {
         Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().descending());
         return transactionRepository.findAllByUser(user, newPageable);
     }

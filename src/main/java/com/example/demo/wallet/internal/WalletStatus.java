@@ -1,4 +1,4 @@
-package com.example.demo.wallet;
+package com.example.demo.wallet.internal;
 
 public enum WalletStatus {
     ACTIVE,

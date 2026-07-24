@@ -2,7 +2,6 @@ package com.example.demo.transaction;
 
 import com.example.demo.transaction.internal.TransactionStatus;
 import com.example.demo.transaction.internal.TransactionType;
-import com.example.demo.user.User;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -16,9 +15,8 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column
+    private Long userId;
 
     @Column(nullable = false)
     private TransactionType transactionType;
@@ -35,12 +33,12 @@ public class Transaction {
 
     protected Transaction() {}
 
-    public Transaction(User user, TransactionType transactionType,
+    public Transaction(Long userId, TransactionType transactionType,
                        TransactionStatus status, UUID idempotencyKey) {
         if (idempotencyKey == null) {
             throw new IllegalArgumentException("idempotencyKey must be supplied by the client");
         }
-        this.user = user;
+        this.userId = userId;
         this.transactionType = transactionType;
         this.status = status;
         this.idempotencyKey = idempotencyKey;
@@ -48,7 +46,7 @@ public class Transaction {
     }
 
     public Long getId() { return id; }
-    public User getUser() { return user; }
+    public Long getUser() { return userId; }
     public TransactionType getTransactionType() { return transactionType; }
     public TransactionStatus getStatus() { return status; }
     public UUID getIdempotencyKey() { return idempotencyKey; }
